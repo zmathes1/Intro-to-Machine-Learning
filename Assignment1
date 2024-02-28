@@ -1,0 +1,242 @@
+# Zachary Matheson
+# 801095035
+# Assignment 1
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from google.colab import drive
+file_path = '/content/drive/My Drive/Colab Notebooks/D3.csv'
+
+# https://github.com/zmathes1/Intro-to-Machine-Learning.git
+
+################################################################################
+# Problem 1
+################################################################################
+
+df = pd.DataFrame(pd.read_csv(file_path))
+df.head()
+X1 = df.values[:, 0]
+X2 = df.values[:, 1]
+X3 = df.values[:, 2]
+Y = df.values[:, 3]
+
+print('X1 =', len(X1))
+print('X2 =', len(X2))
+print('X3 =', len(X3))
+print('Y =', len(Y))
+m = len(Y)
+
+
+plt.scatter(X1,Y, color='red', marker='*')
+plt.grid(True)
+plt.xlabel('X1')
+plt.ylabel('Output')
+plt.title('Training Data based on X1')
+plt.show()
+
+plt.scatter(X2,Y, color='blue', marker='*')
+plt.grid(True)
+plt.xlabel('X2')
+plt.ylabel('Output')
+plt.title('Training Data based on X2')
+plt.show()
+
+plt.scatter(X3,Y, color='green', marker='*')
+plt.grid(True)
+plt.xlabel('X3')
+plt.ylabel('Output')
+plt.title('Training Data based on X3')
+plt.show()
+
+X_0 = np.ones((m,1))
+X_0[:5]
+X_1 = X1.reshape(m,1)
+X_1[:10]
+X_2 = X2.reshape(m,1)
+X_2[:10]
+X_3 = X3.reshape(m,1)
+X_3[:10]
+
+XT1 = np.hstack((X_0, X_1))
+XT1[:5]
+
+XT2 = np.hstack((X_0,X_2))
+XT2[:5]
+
+XT3 = np.hstack((X_0, X_3))
+XT3[:5]
+
+theta = np.zeros(2)
+theta
+# Cost
+def compute_cost(X, Y, theta):
+  predictions = X.dot(theta)
+  errors = np.subtract(predictions, Y)
+  sqrErrors = np.square(errors)
+  J = 1 / (2 * m) * np.sum(sqrErrors)
+  return J
+
+cost1 = compute_cost(XT1, Y, theta)
+print('The cost for given values of XT1 and Y =', cost1)
+cost2 = compute_cost(XT2, Y, theta)
+print('The cost for given values of XT2 and Y =', cost2)
+cost3 = compute_cost(XT3, Y, theta)
+print('The cost for given values of XT3 and Y =', cost3)
+
+# Gradient Descent
+def gradient_descent(X, Y, theta, alpha, iterations):
+  cost_history = np.zeros(iterations)
+
+  for i in range(iterations):
+    predictions = X.dot(theta)
+    errors = np.subtract(predictions, Y)
+    sum_delta = (alpha / m) * X.transpose().dot(errors);
+    theta = theta - sum_delta;
+    cost_history[i] = compute_cost(X, Y, theta)
+
+  return theta, cost_history
+
+theta = [0., 0.]
+iterations = 1500
+alpha = 0.01
+
+# X1
+theta, cost_history = gradient_descent(XT1, Y, theta, alpha, iterations)
+print('Final value of theta =', theta)
+print('cost_history = ', cost_history)
+
+plt.scatter(XT1[:, 1], Y, color='purple', marker='+', label = 'Training Data')
+plt.plot(XT1[:, 1], XT1.dot(theta), color='green', label='Linear Regression')
+
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid(True)
+plt.xlabel('X1')
+plt.ylabel('Output')
+plt.title('Linear Regression fit for X1')
+plt.legend()
+plt.show()
+
+plt.plot(range(1, iterations + 1), cost_history, color='blue')
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid()
+plt.xlabel('Number of iterations')
+plt.ylabel('Cost (J)')
+plt.ylim([0, 8])
+plt.title('Convergence of gradient descent for X1')
+plt.show()
+
+# X2
+theta, cost_history = gradient_descent(XT2, Y, theta, alpha, iterations)
+print('Final value of theta =', theta)
+print('cost_history = ', cost_history)
+
+plt.scatter(XT2[:, 1], Y, color='purple', marker='+', label = 'Training Data')
+plt.plot(XT2[:, 1], XT2.dot(theta), color='green', label='Linear Regression')
+
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid(True)
+plt.xlabel('X2')
+plt.ylabel('Output')
+plt.title('Linear Regression fit for X2')
+plt.legend()
+plt.show()
+
+plt.plot(range(1, iterations + 1), cost_history, color='blue')
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid()
+plt.xlabel('Number of iterations')
+plt.ylabel('Cost (J)')
+plt.ylim([0, 8])
+plt.title('Convergence of gradient descent for X2')
+plt.show()
+
+# X3
+theta, cost_history = gradient_descent(XT3, Y, theta, alpha, iterations)
+print('Final value of theta =', theta)
+print('cost_history = ', cost_history)
+
+plt.scatter(XT3[:, 1], Y, color='purple', marker='+', label = 'Training Data')
+plt.plot(XT3[:, 1], XT3.dot(theta), color='green', label='Linear Regression')
+
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid(True)
+plt.xlabel('X3')
+plt.ylabel('Output')
+plt.title('Linear Regression fit for X3')
+plt.legend()
+plt.show()
+
+plt.plot(range(1, iterations + 1), cost_history, color='blue')
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid()
+plt.xlabel('Number of iterations')
+plt.ylabel('Cost (J)')
+plt.ylim([0, 8])
+plt.title('Convergence of gradient descent for X3')
+plt.show()
+
+################################################################################
+# Problem 2
+################################################################################
+XTT = np.hstack((X_0, X_1, X_2, X_3))
+XTT[:5]
+
+theta = np.zeros(4)
+theta
+
+# Cost
+def compute_cost(X, Y, theta):
+  predictions = X.dot(theta)
+  errors = np.subtract(predictions, Y)
+  sqrErrors = np.square(errors)
+  J = 1 / (2 * m) * np.sum(sqrErrors)
+  return J
+
+alpha = 0.1
+
+cost4 = compute_cost(XTT, Y, theta)
+print('The cost for given values of all inputs and output Y =', cost4)
+
+# Gradient Descent
+def gradient_descent(X, Y, theta, alpha, iterations):
+  cost_history = np.zeros(iterations)
+
+  for i in range(iterations):
+    predictions = X.dot(theta)
+    errors = np.subtract(predictions, Y)
+    sum_delta = (alpha / m) * X.transpose().dot(errors);
+    theta = theta - sum_delta;
+    cost_history[i] = compute_cost(X, Y, theta)
+
+  return theta, cost_history
+
+theta, cost_history = gradient_descent(XTT, Y, theta, alpha, iterations)
+print('The final value of theta =', theta)
+print('cost_history of XTT =', cost_history)
+
+plt.scatter(XTT[:, 1], Y, color='purple', marker='+', label = 'Training Data')
+plt.plot(XTT[:, 1], XTT.dot(theta), color='green', label='Linear Regression')
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid(True)
+plt.xlabel('XTT')
+plt.ylabel('Output')
+plt.title('Linear Regression fit for XTT')
+plt.legend()
+plt.show()
+
+plt.plot(range(1, iterations + 1), cost_history, color='purple')
+plt.rcParams['figure.figsize'] = (10, 6)
+plt.grid()
+plt.xlabel('Iterations')
+plt.ylabel('Cost (J)')
+plt.title('Convergience of gradient descent for XTT')
+plt.show()
+
+Y1= theta[0] + theta[1]*(1) + theta[2]*(1)+ theta[3]*(1)
+print('Y value given (1,1,1)', Y1)
+
+Y2= theta[0] + theta[1]*(2) + theta[2]*(0)+ theta[3]*(4)
+print('Y value given (2,0,4)', Y2)
+
+Y3= theta[0] + theta[1]*(3) + theta[2]*(2)+ theta[3]*(1)
+print('Y value given (3,2,1)', Y3)
